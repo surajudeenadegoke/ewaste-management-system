@@ -1,0 +1,29 @@
+.notification-page {
+  padding: 30px;
+
+  background: #f4f6f9;
+
+  min-height: 100vh;
+}
+
+.notification-card {
+  background: white;
+
+  margin-bottom: 15px;
+
+  padding: 20px;
+
+  border-left: 6px solid green;
+
+  border-radius: 10px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-card h3 {
+  margin-bottom: 8px;
+}
+
+.notification-card small {
+  color: gray;
+}

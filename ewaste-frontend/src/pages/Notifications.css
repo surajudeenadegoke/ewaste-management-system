@@ -1,0 +1,31 @@
+.notification-container {
+
+  width: 80%;
+  margin: 40px auto;
+
+}
+
+
+.notification-card {
+
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #ccc;
+
+}
+
+
+.notification-card h3 {
+
+  margin-bottom: 10px;
+
+}
+
+
+.notification-card p {
+
+  font-size: 16px;
+
+}

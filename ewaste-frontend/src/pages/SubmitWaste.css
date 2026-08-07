@@ -1,0 +1,80 @@
+.submit-container {
+  min-height: 100vh;
+  background: linear-gradient(
+    to right,
+    #d4fc79,
+    #96e6a1
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.submit-card {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.submit-card h1 {
+  text-align: center;
+  color: #1b5e20;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.submit-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.submit-card input {
+  margin-bottom: 15px;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.submit-card input:focus {
+  outline: none;
+  border: 1px solid green;
+}
+
+.submit-card label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.submit-card button {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.submit-card button:hover {
+  background: #1b5e20;
+}
+
+@media (max-width: 768px) {
+  .submit-card {
+    padding: 30px 20px;
+  }
+}
