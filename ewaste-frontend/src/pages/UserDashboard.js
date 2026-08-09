@@ -9,42 +9,41 @@ function UserDashboard() {
   const [points, setPoints] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(`${API_URL}/api/waste/my`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(points);
-      setWastes(res.data.wastes);
-      setPoints(res.data.rewardPoints);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      alert("Failed to load dashboard");
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(`${API_URL}/api/waste/my`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setWastes(res.data.wastes);
+        setPoints(res.data.rewardPoints);
+      } catch (error) {
+        console.log(error);
+        alert("Failed to load dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  });
+  }, []);
 
   return (
     <>
       <Navbar />
-      <div className="user-container">
-        <div className="dashboard-header">
-          <div>
-            <h1>♻️ E-Waste Management System</h1>
-            <p>My Points: {points}</p>
 
-            <p>Manage your electronic waste submissions</p>
-          </div>
+      <div className="user-dashboard">
+        <div className="dashboard-header">
+          <h1>♻️ E-Waste Management System</h1>
+          <h2>My Points: {points}</h2>
+          <p>Manage your electronic waste submissions</p>
         </div>
+
         {loading ? (
           <p className="loading">Loading...</p>
         ) : wastes.length === 0 ? (
