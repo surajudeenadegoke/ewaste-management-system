@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import "./AdminNotifications.css";
+import API_URL from "../config";
 
 function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
@@ -11,7 +12,7 @@ function AdminNotifications() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5001/api/admin/notifications",
+        `${API_URL}/api/admin/notifications`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

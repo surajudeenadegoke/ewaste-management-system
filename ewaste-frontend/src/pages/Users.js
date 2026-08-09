@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import "./Users.css";
+import API_URL from "../config";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -17,7 +18,7 @@ function Users() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://localhost:5001/api/users",
+        `${API_URL}/api/users`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

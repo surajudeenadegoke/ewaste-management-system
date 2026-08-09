@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import "./UserDashboard.css";
+import API_URL from "../config";
 
 function UserDashboard() {
   const [wastes, setWastes] = useState([]);
@@ -12,7 +13,7 @@ function UserDashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.get("http://localhost:5001/api/waste/my", {
+      const res = await axios.get(`${API_URL}/api/waste/my`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import "./AdminDashboard.css";
+import API_URL from "../config";
 
 
 function AdminDashboard() {
@@ -24,7 +25,7 @@ function AdminDashboard() {
 
 
       const res = await axios.get(
-        "http://localhost:5001/api/waste/all",
+        `${API_URL}/api/waste/all`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

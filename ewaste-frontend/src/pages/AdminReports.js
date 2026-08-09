@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import "./AdminReports.css";
+import API_URL from "../config";
 
 function AdminReports() {
   const [stats, setStats] = useState({
@@ -32,12 +33,12 @@ function AdminReports() {
 
       const [statsResponse, wastesResponse] = await Promise.all([
         axios.get(
-          "http://localhost:5001/api/admin/stats",
+          `${API_URL}/api/admin/stats`,
           config
         ),
 
         axios.get(
-          "http://localhost:5001/api/waste/all",
+          `${API_URL}/api/waste/all`,
           config
         ),
       ]);

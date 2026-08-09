@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import "./SubmitWaste.css";
+import API_URL from "../config";
 
 function SubmitWaste() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ function SubmitWaste() {
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:5001/api/waste",
+        `${API_URL}/api/waste`,
         formData,
         {
           headers: {
