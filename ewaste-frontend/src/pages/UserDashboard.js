@@ -31,7 +31,7 @@ function UserDashboard() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   return (
     <>
