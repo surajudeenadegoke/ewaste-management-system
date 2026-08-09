@@ -18,7 +18,7 @@ function UserDashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log(points);
       setWastes(res.data.wastes);
       setPoints(res.data.rewardPoints);
       setLoading(false);
@@ -40,6 +40,7 @@ function UserDashboard() {
         <div className="dashboard-header">
           <div>
             <h1>♻️ E-Waste Management System</h1>
+            <p>My Points: {points}</p>
 
             <p>Manage your electronic waste submissions</p>
           </div>
