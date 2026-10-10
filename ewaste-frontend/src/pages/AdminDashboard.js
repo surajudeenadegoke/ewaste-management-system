@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
@@ -6,6 +7,7 @@ import API_URL from "../config";
 
 function AdminDashboard() {
   const [wastes, setWastes] = useState([]);
+
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalWaste: 0,
@@ -14,95 +16,165 @@ function AdminDashboard() {
     collected: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+  const [error, setError] = useState("");
+
+  const getAuthHeaders = () => ({
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  });
+
+  // FETCH ALL WASTE REQUESTS
   const fetchWaste = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(`${API_URL}/api/waste/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setWastes(res.data);
-    } catch (error) {
-      console.log(error);
-
-      alert("Failed to load waste data");
-    }
-  };
-  const fetchStats = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get("http://localhost:5001/api/admin/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setStats(res.data);
-    } catch (error) {
-      console.log(error);
-      alert("Failed to load dashboard statistics");
-    }
-  };
-
-  // APPROVE WASTE + AWARD REWARD
-
-  const approveWaste = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      await axios.put(
-        `http://localhost:5001/api/waste/${id}/approve`,
-
-        {},
-
+      const res = await axios.get(
+        `${API_URL}/api/waste/all`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+          headers: getAuthHeaders(),
+        }
       );
 
-      alert("Waste approved successfully. Reward points awarded.");
+      setWastes(
+        Array.isArray(res.data) ? res.data : []
+      );
 
-      fetchWaste();
-      fetchStats();
+      return true;
     } catch (error) {
-      console.log(error);
+      console.error("Waste fetch error:", error);
 
-      alert(error.response?.data?.message || "Approval failed");
+      setError(
+        error.response?.data?.message ||
+        "Failed to load waste requests."
+      );
+
+      return false;
     }
   };
 
-  // UPDATE STATUS TO COLLECTED
-
-  const updateStatus = async (id, status) => {
+  // FETCH DASHBOARD STATISTICS
+  const fetchStats = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${API_URL}/api/admin/stats`,
+        {
+          headers: getAuthHeaders(),
+        }
+      );
 
-      axios.get(`${API_URL}/api/admin/stats`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      setStats({
+        totalUsers: res.data.totalUsers ?? 0,
+        totalWaste: res.data.totalWaste ?? 0,
+        pending: res.data.pending ?? 0,
+        approved: res.data.approved ?? 0,
+        collected: res.data.collected ?? 0,
       });
 
-      alert("Status updated");
-
-      fetchWaste();
-      fetchStats();
+      return true;
     } catch (error) {
-      console.log(error);
+      console.error("Statistics error:", error);
 
-      alert("Status update failed");
+      setError(
+        error.response?.data?.message ||
+        "Failed to load dashboard statistics."
+      );
+
+      return false;
+    }
+  };
+
+  // LOAD DASHBOARD DATA
+  const loadDashboard = async () => {
+    setLoading(true);
+    setError("");
+
+    await Promise.all([
+      fetchWaste(),
+      fetchStats(),
+    ]);
+
+    setLoading(false);
+  };
+
+  // APPROVE WASTE AND AWARD POINTS
+  const approveWaste = async (id) => {
+    if (processingId) return;
+
+    try {
+      setProcessingId(id);
+      setError("");
+
+      await axios.put(
+        `${API_URL}/api/waste/${id}/approve`,
+        {},
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
+      alert(
+        "Waste approved successfully. Reward points awarded."
+      );
+
+      await Promise.all([
+        fetchWaste(),
+        fetchStats(),
+      ]);
+
+    } catch (error) {
+      console.error("Approval error:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "Waste approval failed.";
+
+      setError(message);
+      alert(message);
+
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  // UPDATE WASTE STATUS TO COLLECTED
+  const updateStatus = async (id, status) => {
+    if (processingId) return;
+
+    try {
+      setProcessingId(id);
+      setError("");
+
+      await axios.put(
+        `${API_URL}/api/waste/${id}`,
+        { status },
+        {
+          headers: getAuthHeaders(),
+        }
+      );
+
+      alert("Waste status updated successfully.");
+
+      await Promise.all([
+        fetchWaste(),
+        fetchStats(),
+      ]);
+
+    } catch (error) {
+      console.error("Status update error:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to update waste status.";
+
+      setError(message);
+      alert(message);
+
+    } finally {
+      setProcessingId(null);
     }
   };
 
   useEffect(() => {
-    fetchWaste();
-    fetchStats();
+    loadDashboard();
   }, []);
 
   return (
@@ -111,6 +183,26 @@ function AdminDashboard() {
 
       <div className="admin-container">
         <h1>♻️ Admin Dashboard</h1>
+
+        {error && (
+          <div
+            role="alert"
+            style={{
+              background: "#ffebee",
+              color: "#b71c1c",
+              padding: "12px",
+              borderRadius: "6px",
+              marginBottom: "15px",
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {loading && (
+          <p>Loading dashboard information...</p>
+        )}
+
         <div className="admin-stats">
           <div className="admin-stat-card">
             <h3>👥 Total Users</h3>
@@ -143,19 +235,12 @@ function AdminDashboard() {
             <thead>
               <tr>
                 <th>User</th>
-
                 <th>Email</th>
-
                 <th>Waste Type</th>
-
                 <th>Quantity</th>
-
                 <th>Location</th>
-
                 <th>Pickup Date</th>
-
                 <th>Status</th>
-
                 <th>Action</th>
               </tr>
             </thead>
@@ -163,9 +248,9 @@ function AdminDashboard() {
             <tbody>
               {wastes.map((waste) => (
                 <tr key={waste._id}>
-                  <td>{waste.user?.name}</td>
+                  <td>{waste.user?.name || "N/A"}</td>
 
-                  <td>{waste.user?.email}</td>
+                  <td>{waste.user?.email || "N/A"}</td>
 
                   <td>{waste.wasteType}</td>
 
@@ -173,10 +258,18 @@ function AdminDashboard() {
 
                   <td>{waste.location}</td>
 
-                  <td>{new Date(waste.pickupDate).toLocaleDateString()}</td>
+                  <td>
+                    {waste.pickupDate
+                      ? new Date(
+                          waste.pickupDate
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </td>
 
                   <td>
-                    <span className={`status ${waste.status}`}>
+                    <span
+                      className={`status ${waste.status}`}
+                    >
                       {waste.status}
                     </span>
                   </td>
@@ -185,23 +278,56 @@ function AdminDashboard() {
                     {waste.status === "pending" && (
                       <button
                         className="approve-btn"
-                        onClick={() => approveWaste(waste._id)}
+                        disabled={processingId !== null}
+                        onClick={() =>
+                          approveWaste(waste._id)
+                        }
                       >
-                        Approve
+                        {processingId === waste._id
+                          ? "Approving..."
+                          : "Approve"}
                       </button>
                     )}
 
                     {waste.status === "approved" && (
                       <button
                         className="collect-btn"
-                        onClick={() => updateStatus(waste._id, "collected")}
+                        disabled={processingId !== null}
+                        onClick={() =>
+                          updateStatus(
+                            waste._id,
+                            "collected"
+                          )
+                        }
                       >
-                        Collected
+                        {processingId === waste._id
+                          ? "Updating..."
+                          : "Collected"}
                       </button>
+                    )}
+
+                    {waste.status === "collected" && (
+                      <span>Completed</span>
                     )}
                   </td>
                 </tr>
               ))}
+
+              {!loading && wastes.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="8"
+                    style={{
+                      textAlign: "center",
+                      padding: "20px",
+                    }}
+                  >
+                    {error
+                      ? "Unable to load waste requests."
+                      : "No waste requests found."}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
